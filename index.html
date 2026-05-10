@@ -15,10 +15,8 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         
-        // ⚠️ رابط الـ Google Apps Script بتاعك
         const API_URL = "https://script.google.com/macros/s/AKfycbxtB7ezMX6zzbWaPadp71ohAPYgPHH8O1VZTx34SPinkfOLjSWZ_iNLI9mO2EUC4Qn6/exec"; 
 
-        // دالة مساعدة عشان نتكلم مع الـ GAS ونعدي الـ CORS
         async function callAPI(action, params = {}) {
             const url = new URL(API_URL);
             url.searchParams.append('action', action);
@@ -34,7 +32,6 @@
             }
         }
 
-        // ========== شاشة تسجيل الدخول ==========
         function LoginForm({ onLogin }) {
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
@@ -46,7 +43,6 @@
                 setLoading(true);
                 setError('');
                 try {
-                    // بنتكلم مع الـ GAS عن طريق الـ URL Parameters
                     const res = await callAPI('login', { email, password });
                     if (res.success) {
                         onLogin(res.user);
@@ -91,11 +87,11 @@
             );
         }
 
-        // ========== شاشة الداشبورد الرئيسية ==========
         function Dashboard({ user, onLogout }) {
             const [links, setLinks] = useState([]);
             const [showModal, setShowModal] = useState(false);
             const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [savingLink, setSavingLink] = useState(false); // متغير عشان نقفل الزرار أثناء الحفظ
             const [formData, setFormData] = useState({ siteName: '', linkConfig: '', scope: '', partner: '', region: '', engineer: '', status: 'Pending' });
 
             useEffect(() => { fetchLinks(); }, []);
@@ -109,14 +105,21 @@
 
             const handleSubmit = async (e) => {
                 e.preventDefault();
-                const res = await callAPI('addLink', formData);
-                if (res.success) {
-                    alert("Link saved successfully!");
-                    setShowModal(false);
-                    setFormData({ siteName: '', linkConfig: '', scope: '', partner: '', region: '', engineer: '', status: 'Pending' });
-                    fetchLinks();
-                } else {
-                    alert("Error saving link!");
+                setSavingLink(true); // قفل الزرار
+                try {
+                    const res = await callAPI('addLink', formData);
+                    if (res.success) {
+                        alert("Link saved successfully!");
+                        setShowModal(false);
+                        setFormData({ siteName: '', linkConfig: '', scope: '', partner: '', region: '', engineer: '', status: 'Pending' });
+                        fetchLinks();
+                    } else {
+                        alert("Error saving link!");
+                    }
+                } catch (err) {
+                    alert("Error!");
+                } finally {
+                    setSavingLink(false); // فتح الزرار تاني
                 }
             };
 
@@ -238,7 +241,9 @@
                                     </div>
                                     <div className="flex justify-end space-x-3 mt-6">
                                         <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 text-slate-600 bg-slate-200 rounded-lg hover:bg-slate-300 transition font-medium text-sm">Cancel</button>
-                                        <button type="submit" className="px-5 py-2.5 bg-[#124191] text-white rounded-lg hover:bg-[#0e3170] shadow transition font-medium text-sm">Save Link</button>
+                                        <button type="submit" disabled={savingLink} className="px-5 py-2.5 bg-[#124191] text-white rounded-lg hover:bg-[#0e3170] shadow transition font-medium text-sm disabled:opacity-50">
+                                            {savingLink ? 'Saving...' : 'Save Link'}
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -248,7 +253,6 @@
             );
         }
 
-        // ========== التطبيق الأساسي ==========
         function App() {
             const [user, setUser] = useState(null);
 
