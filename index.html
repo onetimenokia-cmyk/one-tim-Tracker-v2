@@ -19,7 +19,7 @@
         // ⚠️ حط رابط الباك إند بتاعك هنا
         const API_URL = "https://YOUR-BACKEND-URL.onrender.com"; 
 
-        // ========== شاشة تسجيل الدخول ==========
+        // ========== شاشة تسجيل الدخول (متجاوبة مع كل الشاشات) ==========
         function LoginForm({ onLogin }) {
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
@@ -45,13 +45,13 @@
             };
 
             return (
-                <div className="min-h-screen flex items-center justify-center bg-slate-100">
-                    <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-slate-200">
+                <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
+                    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md border border-slate-200">
                         <div className="text-center mb-8">
-                            <div className="mx-auto w-24 h-24 bg-[#124191] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                                <span className="text-white text-5xl font-bold tracking-tighter">OT</span>
+                            <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-[#124191] rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                                <span className="text-white text-4xl sm:text-5xl font-bold tracking-tighter">OT</span>
                             </div>
-                            <h2 className="text-2xl font-bold text-slate-800">One Time Tracker</h2>
+                            <h2 className="text-xl sm:text-2xl font-bold text-slate-800">One Time Tracker</h2>
                             <p className="text-slate-400 text-sm mt-1">Enter your credentials to continue</p>
                         </div>
                         
@@ -60,11 +60,11 @@
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
                                 <label className="block text-sm font-semibold text-slate-600 mb-1">Email</label>
-                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-slate-700" required placeholder="Enter email" />
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-slate-700 text-sm sm:text-base" required placeholder="Enter email" />
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-slate-600 mb-1">Password</label>
-                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-slate-700" required placeholder="Enter password" />
+                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-slate-700 text-sm sm:text-base" required placeholder="Enter password" />
                             </div>
                             <button type="submit" disabled={loading} className="w-full bg-[#124191] hover:bg-[#0e3170] text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-md disabled:opacity-50">
                                 {loading ? 'Signing In...' : 'Sign In'}
@@ -75,10 +75,11 @@
             );
         }
 
-        // ========== شاشة الداشبورد الرئيسية ==========
+        // ========== شاشة الداشبورد الرئيسية (متجاوبة بالكامل) ==========
         function Dashboard({ user, onLogout }) {
             const [links, setLinks] = useState([]);
             const [showModal, setShowModal] = useState(false);
+            const [isMenuOpen, setIsMenuOpen] = useState(false); // للتحكم في قائمة الموبايل
             const [formData, setFormData] = useState({ linkId: '', linkConfig: '', scope: '', company: '', area: '', owner: '', note: '', type: 'new' });
 
             useEffect(() => { fetchLinks(); }, []);
@@ -109,17 +110,25 @@
 
             return (
                 <div className="flex h-screen overflow-hidden bg-slate-50">
-                    {/* القائمة الجانبية (ستايل نوكيا الأصلي) */}
-                    <aside className="w-64 bg-[#1e293b] text-white flex flex-col shadow-xl">
+                    
+                    {/* خلفية سودة لما القائمة تفتح في الموبايل */}
+                    {isMenuOpen && (
+                        <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={() => setIsMenuOpen(false)}></div>
+                    )}
+
+                    {/* القائمة الجانبية (متجاوبة - بتختفي في الموبايل وتظهر كـ Overlay) */}
+                    <aside className={`fixed inset-y-0 left-0 w-64 bg-[#1e293b] text-white flex flex-col shadow-xl z-30 transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
                         <div className="h-16 flex items-center justify-center border-b border-slate-700">
                             <div className="w-10 h-10 bg-[#124191] rounded-lg flex items-center justify-center mr-3 shadow">
                                 <span className="text-white font-bold text-sm tracking-tighter">OT</span>
                             </div>
                             <h1 className="text-base font-bold text-slate-200 tracking-wide">One Time</h1>
+                            {/* زرار قفل القائمة في الموبايل */}
+                            <button onClick={() => setIsMenuOpen(false)} className="absolute right-3 top-4 text-slate-400 md:hidden text-xl">&times;</button>
                         </div>
                         <nav className="flex-1 px-4 py-6 space-y-2">
-                            <button className="w-full text-left px-4 py-2.5 rounded-lg bg-[#124191] text-white font-medium shadow-sm">Dashboard</button>
-                            <button onClick={() => setShowModal(true)} className="w-full text-left px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">+ Add New Link</button>
+                            <button onClick={() => setIsMenuOpen(false)} className="w-full text-left px-4 py-2.5 rounded-lg bg-[#124191] text-white font-medium shadow-sm">Dashboard</button>
+                            <button onClick={() => { setShowModal(true); setIsMenuOpen(false); }} className="w-full text-left px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">+ Add New Link</button>
                             <button className="w-full text-left px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">Tracking</button>
                             <button className="w-full text-left px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition">Settings</button>
                         </nav>
@@ -131,81 +140,100 @@
                     </aside>
 
                     {/* المحتوى الرئيسي */}
-                    <main className="flex-1 overflow-y-auto p-8">
-                        <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
-                            <button onClick={() => setShowModal(true)} className="bg-[#124191] hover:bg-[#0e3170] text-white px-5 py-2.5 rounded-lg shadow transition">+ Add New Link</button>
+                    <main className="flex-1 overflow-y-auto w-full">
+                        
+                        {/* الهيدر الخاص بالموبايل (بيظهر بس على الشاشات الصغيرة) */}
+                        <div className="md:hidden flex items-center justify-between bg-white p-4 border-b border-slate-200 shadow-sm sticky top-0 z-10">
+                            <button onClick={() => setIsMenuOpen(true)} className="text-slate-700 text-2xl">&#9776;</button>
+                            <div className="flex items-center">
+                                <div className="w-8 h-8 bg-[#124191] rounded-md flex items-center justify-center mr-2 shadow">
+                                    <span className="text-white font-bold text-xs tracking-tighter">OT</span>
+                                </div>
+                                <h1 className="text-sm font-bold text-slate-700">One Time</h1>
+                            </div>
+                            <div className="w-8"></div> {/* عشان الخلابة تكون في النص بالظبط */}
                         </div>
 
-                        {/* كروت الإحصائيات (برواز أزرق نوكيا) */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
-                                <h3 className="text-slate-500 text-sm font-semibold">Not Sent to Telegram</h3>
-                                <p className="text-3xl font-bold text-slate-800 mt-2">{pending}</p>
+                        <div className="p-4 sm:p-6 lg:p-8">
+                            <div className="flex justify-between items-center mb-6 sm:mb-8">
+                                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Dashboard</h2>
+                                <button onClick={() => setShowModal(true)} className="hidden sm:block bg-[#124191] hover:bg-[#0e3170] text-white px-5 py-2.5 rounded-lg shadow transition text-sm">+ Add New Link</button>
+                                {/* زرار عائم في الموبايل عشان تضيف لينك جديد */}
+                                <button onClick={() => setShowModal(true)} className="sm:hidden fixed bottom-6 right-6 bg-[#124191] hover:bg-[#0e3170] text-white p-4 rounded-full shadow-xl z-10 text-2xl">+</button>
                             </div>
-                            <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-[#124191]">
-                                <h3 className="text-slate-500 text-sm font-semibold">Total Links</h3>
-                                <p className="text-3xl font-bold text-slate-800 mt-2">{totalLinks}</p>
-                            </div>
-                            <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
-                                <h3 className="text-slate-500 text-sm font-semibold">Completed (On Telegram)</h3>
-                                <p className="text-3xl font-bold text-slate-800 mt-2">{completed}</p>
-                            </div>
-                        </div>
 
-                        {/* جدول البيانات */}
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-[#124191] text-white text-sm">
-                                        <th className="p-5 font-medium">Link ID</th>
-                                        <th className="p-5 font-medium">Scope</th>
-                                        <th className="p-5 font-medium">Company</th>
-                                        <th className="p-5 font-medium">Area</th>
-                                        <th className="p-5 font-medium">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {links.length === 0 ? (
-                                        <tr><td colSpan="5" className="p-8 text-center text-slate-400">No links found. Add your first link!</td></tr>
-                                    ) : (
-                                        links.map((link, index) => (
-                                            <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                                                <td className="p-5 font-semibold text-[#124191]">{link.linkId}</td>
-                                                <td className="p-5 text-slate-600">{link.scope}</td>
-                                                <td className="p-5 text-slate-600">{link.company}</td>
-                                                <td className="p-5 text-slate-600">{link.area}</td>
-                                                <td className="p-5">
-                                                    <span className={`px-3 py-1.5 rounded-md text-xs font-semibold ${link.status === 'On Telegram' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-                                                        {link.status}
-                                                    </span>
-                                                </td>
+                            {/* كروت الإحصائيات (بتغير حجمها حسب الشاشة) */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-red-500">
+                                    <h3 className="text-slate-500 text-xs sm:text-sm font-semibold">Not Sent to Telegram</h3>
+                                    <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1 sm:mt-2">{pending}</p>
+                                </div>
+                                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-[#124191]">
+                                    <h3 className="text-slate-500 text-xs sm:text-sm font-semibold">Total Links</h3>
+                                    <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1 sm:mt-2">{totalLinks}</p>
+                                </div>
+                                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                                    <h3 className="text-slate-500 text-xs sm:text-sm font-semibold">Completed (On Telegram)</h3>
+                                    <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1 sm:mt-2">{completed}</p>
+                                </div>
+                            </div>
+
+                            {/* جدول البيانات (بيمسح شمال ويمين على الموبايل) */}
+                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse min-w-[600px]">
+                                        <thead>
+                                            <tr className="bg-[#124191] text-white text-xs sm:text-sm">
+                                                <th className="p-4 sm:p-5 font-medium">Link ID</th>
+                                                <th className="p-4 sm:p-5 font-medium">Scope</th>
+                                                <th className="p-4 sm:p-5 font-medium">Company</th>
+                                                <th className="p-4 sm:p-5 font-medium">Area</th>
+                                                <th className="p-4 sm:p-5 font-medium">Status</th>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                        </thead>
+                                        <tbody>
+                                            {links.length === 0 ? (
+                                                <tr><td colSpan="5" className="p-8 text-center text-slate-400">No links found. Add your first link!</td></tr>
+                                            ) : (
+                                                links.map((link, index) => (
+                                                    <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                                                        <td className="p-4 sm:p-5 font-semibold text-[#124191]">{link.linkId}</td>
+                                                        <td className="p-4 sm:p-5 text-slate-600">{link.scope}</td>
+                                                        <td className="p-4 sm:p-5 text-slate-600">{link.company}</td>
+                                                        <td className="p-4 sm:p-5 text-slate-600">{link.area}</td>
+                                                        <td className="p-4 sm:p-5">
+                                                            <span className={`px-2 sm:px-3 py-1 rounded-md text-xs font-semibold ${link.status === 'On Telegram' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                                                                {link.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </main>
 
-                    {/* نافذة إضافة لينك جديد */}
+                    {/* نافذة إضافة لينك جديد (متجاوبة) */}
                     {showModal && (
-                        <div className="fixed inset-0 bg-[#1e293b]/50 backdrop-blur-sm flex items-center justify-center z-50">
-                            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-8 border border-slate-200">
-                                <h2 className="text-2xl font-bold mb-6 text-slate-800">Add New Link</h2>
+                        <div className="fixed inset-0 bg-[#1e293b]/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-50">
+                            <div className="bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full sm:max-w-lg p-6 sm:p-8 border border-slate-200 max-h-[90vh] overflow-y-auto">
+                                <h2 className="text-xl sm:text-2xl font-bold mb-6 text-slate-800">Add New Link</h2>
                                 <form onSubmit={handleSubmit}>
-                                    <div className="grid grid-cols-2 gap-5 mb-5">
-                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Link ID</label><input type="text" name="linkId" value={formData.linkId} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition" required /></div>
-                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Scope</label><input type="text" name="scope" value={formData.scope} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition" required /></div>
-                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Company</label><input type="text" name="company" value={formData.company} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition" required /></div>
-                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Area</label><input type="text" name="area" value={formData.area} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition" required /></div>
-                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Owner</label><input type="text" name="owner" value={formData.owner} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition" /></div>
-                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Config</label><input type="text" name="linkConfig" value={formData.linkConfig} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition" /></div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-5">
+                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Link ID</label><input type="text" name="linkId" value={formData.linkId} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-sm" required /></div>
+                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Scope</label><input type="text" name="scope" value={formData.scope} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-sm" required /></div>
+                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Company</label><input type="text" name="company" value={formData.company} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-sm" required /></div>
+                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Area</label><input type="text" name="area" value={formData.area} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-sm" required /></div>
+                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Owner</label><input type="text" name="owner" value={formData.owner} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-sm" /></div>
+                                        <div><label className="block text-sm font-semibold text-slate-600 mb-1">Config</label><input type="text" name="linkConfig" value={formData.linkConfig} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-sm" /></div>
                                     </div>
-                                    <div className="mb-6"><label className="block text-sm font-semibold text-slate-600 mb-1">Notes</label><textarea name="note" value={formData.note} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition" rows="3"></textarea></div>
+                                    <div className="mb-6"><label className="block text-sm font-semibold text-slate-600 mb-1">Notes</label><textarea name="note" value={formData.note} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-[#124191] focus:border-transparent focus:outline-none transition text-sm" rows="3"></textarea></div>
                                     <div className="flex justify-end space-x-3">
-                                        <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 text-slate-600 bg-slate-200 rounded-lg hover:bg-slate-300 transition font-medium">Cancel</button>
-                                        <button type="submit" className="px-5 py-2.5 bg-[#124191] text-white rounded-lg hover:bg-[#0e3170] shadow transition font-medium">Save & Send</button>
+                                        <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 text-slate-600 bg-slate-200 rounded-lg hover:bg-slate-300 transition font-medium text-sm">Cancel</button>
+                                        <button type="submit" className="px-5 py-2.5 bg-[#124191] text-white rounded-lg hover:bg-[#0e3170] shadow transition font-medium text-sm">Save & Send</button>
                                     </div>
                                 </form>
                             </div>
